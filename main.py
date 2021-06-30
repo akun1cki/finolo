@@ -1,14 +1,10 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
-from front_v4 import Ui_MainWindow
 from app_login import LoginScreen
+from PyQt5 import QtWidgets
 
 if __name__ == "__main__":
     import sys
-    # Launch up without loging in
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle('Fusion')
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    # ui.setupUi(MainWindow)
-    ui.show()
+    app2 = LoginScreen()
+    app2.show()
     sys.exit(app.exec_())
