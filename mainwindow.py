@@ -1,8 +1,5 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLineEdit, QCompleter
-import pandas as pd
-from backend import Backend
 from portf import Portfolio
 from strategies import Strategies
 from charts import OHLCChart, ChartWidget
@@ -11,9 +8,9 @@ from signals import Signals
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
-    def __init__(self): #, back):
+    def __init__(self, back):
         super().__init__()
-        self.back = Backend() #back #Backend()
+        self.back = back
         self.setObjectName("MainWindow")
         self.resize(1136, 701)
         self.centralwidget = QtWidgets.QWidget(self)
@@ -101,17 +98,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.left_panel_load = QtWidgets.QPushButton(self.left_panel)
         self.left_panel_load.setGeometry(QtCore.QRect(0, 31, 150, 35))
         self.left_panel_load.setObjectName("left_panel_load")
-        # self.price_table = QtWidgets.QTableWidget(self.left_panel)
-        # self.price_table.setGeometry(QtCore.QRect(0, 66, 150, 590))
-        # self.price_table.setStyleSheet("background-color: rgb(0, 170, 255);")
-        # self.price_table.setObjectName("price_table")
-        # self.price_table.setRowCount(20)
-        # self.price_table.setColumnCount(1)
-        # self.price_table.verticalHeader().setVisible(False)
-        # self.price_table.horizontalHeader().hide()
-        # self.price_table.verticalHeader().setDefaultSectionSize(29)
-        # self.price_table.setColumnWidth(0, 150)
-
         self.price_table = QtWidgets.QTableView(self.left_panel)
         self.price_table.setGeometry(QtCore.QRect(0, 66, 150, 590))
         self.price_table.setStyleSheet("background-color: rgb(0, 170, 255);")
@@ -235,15 +221,3 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.actionNew.setText(_translate("MainWindow", "New"))
         self.actionSave.setText(_translate("MainWindow", "Save"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
-
-
-'''
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
-'''
