@@ -26,7 +26,7 @@ class Backend(object):
         self.wig20_tickers = 'ALR ALE ACP CCC CDR CPS DNP JSW KGH LTS LPP OPL PEO PGE PGN PKN PKO PZU SPL TPE'.split()
 
         try:
-            self.df = pd.read_csv('aaa.csv', index_col = 0)
+            self.df = pd.read_csv('last_day_info.csv', index_col = 0)
         except:
             self.df = pd.DataFrame(columns = ['Close', 'Percent change'], index = self.wig20_tickers)
 
@@ -70,7 +70,7 @@ class Backend(object):
                 df['Percent change'] = list(map(lambda x: str(x) + '%', df['Percent change'])) #df['Percent change'].apply(lambda x: f'{x}%')
 
                 self.df.loc[ticker] = [df['Close'].values[0], df['Percent change'].values[1]]
-        self.df.to_csv('aaa.csv')
+        self.df.to_csv('last_day_info.csv')
         last_run.truncate(0)
         last_run.close()
         with open('last_run.txt', 'a') as myfile:
