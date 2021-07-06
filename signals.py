@@ -101,8 +101,13 @@ class Signals(QtWidgets.QWidget):
         QtCore.QMetaObject.connectSlotsByName(self)
 
         self.dummy_df = self.back.quandl_asset_df('WSE/ALIOR')
-
-        self.signal_no_ext = [".".join(f.split(".")[:-1]) for f in os.listdir('signals/')]
+        
+        # same here
+        if os.path.exists('signals'):
+            self.signal_no_ext = [".".join(f.split(".")[:-1]) for f in os.listdir('signals/')]
+        else:
+            os.makedirs('signals')
+            self.signal_no_ext = []
 
         # Update signal list
         self.signal_list.clear()
@@ -221,6 +226,8 @@ class Signals(QtWidgets.QWidget):
         server.login(me, password)
         server.sendmail(me, you, message.as_string())
         server.quit()
+        
+        
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
