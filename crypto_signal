@@ -1,0 +1,104 @@
+import ccxt
+import pandas as pd
+import numpy as np
+import datetime
+import yagmail
+import os
+import json
+import time
+
+
+class CryptoSignal:
+	def __init__(self):
+		self.exchange = ccxt.binance({'enableRateLimit': True})
+		self.config = None
+		try:
+			self.server = yagmail.SMTP()
+		except:
+			self.register_email()
+			self.server = yagmail.SMTP()
+
+		if 'config.cfg' not in os.listdir():
+			with open('config.cfg', 'w') as config:
+				config.write('{"Recipients": []}')
+		else:
+			with open('config.cfg', 'r') as config:
+				self.config = json.load(config)
+
+	def find_ath(self, ticker):
+		data = self.get_data(ticker)[2]
+		ath = data.max(axis=0)
+		idx = data.idxmax(axis=0)
+		date = pd.to_datetime(idx*1000000)
+		today = datetime.datetime.today()
+		delta = today - date
+		return ath, idx, date, delta
+
+	def get_data(self, ticker):
+		data = []
+		count = 0
+		since = 0
+		interval = '1d'
+		while True:
+			data2 = self.exchange.fetch_ohlcv(ticker, interval, since)
+			data += data2
+			count += 1
+			if len(d2) <= 1:
+				break
+			else:
+				since = data2[-1][0]
+		df = pd.DataFrame(data)
+		df.drop_duplicates(subset=0, inplace=True)
+		df.name = ticker + '_' + self.exchange.id + '_' + interval
+		df.set_index(0, inplace=True)
+		return df
+
+	def set_exchange(self):
+		exchange_name = input('Enter exchange name:')
+		self.exchange = getattr(ccxt, exchange_name)({'enableRateLimit': True})
+
+	def send_email2(self, data):
+		today = datetime.datetime.today()
+		msg = f"""
+		Ticker: {data['ticker']}
+		Current price: {data['price']}
+		Previous ATH: {data['ath']}
+		Previous ATH date: {data['ath_date']}
+		Todays date: {str(today)[:-7]}
+		"""
+
+		subject = f"New high on {data['ticker']}: {data['price']}"
+		for recipient in self.config['Recipients']:
+			self.server.send(to=recipient, subject=subject, contents=msg)
+			print(f'msg sent to {recipient}')
+
+	def monitor_ticker(self, ticker, sleep_time=120):
+		ath, idx, ath_date, delta = self.find_ath(ticker)
+		while True:
+			data = self.exchange.fetch_ticker(ticker)
+			if data['bid'] > ath and data['timestamp'] - idx > 86400000:
+				self.send_email2({'ticker': ticker, 'price': data['bid'], 'ath': ath, 'ath_date': ath_date})
+				break
+			else:
+				time.sleep(sleep_time)
+
+
+	def register_email(self):
+		user = input('Email:')
+		password = input('Password:')
+		yagmail.register(user, password)
+
+	def add_recipient(self, email):
+		with open('config.cfg', 'r+') as config:
+			self.config = json.load(config)
+			self.config['Recipients'].append(email)
+			js = json.dumps(self.config)
+			config.seek(0)
+			config.write(js)
+			config.truncate()
+
+
+
+
+
+
