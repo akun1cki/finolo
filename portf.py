@@ -100,7 +100,13 @@ class Portfolio(QtWidgets.QWidget):
         self.portf_add.clicked.connect(self.add_asset)
         self.portf_remove.clicked.connect(self.remove_asset)
 
-        self.portf_no_ext = [".".join(f.split(".")[:-1]) for f in os.listdir('portfolios/')] # if os.path.isfile(f)]
+                # zmieniłem żeby stworzyło folder jak nie ma
+        if os.path.exists('portfolios'):
+            self.portf_no_ext = [".".join(f.split(".")[:-1]) for f in
+                                 os.listdir('portfolios/')]  # if os.path.isfile(f)]
+        else:
+            os.makedirs('portfolios')
+            self.portf_no_ext = []
 
         self.portf_left_load.clicked.connect(self.load_portf)
 
